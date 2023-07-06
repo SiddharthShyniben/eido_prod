@@ -1,16 +1,29 @@
 <script>
     import {Content, Grid, Row, Column, FluidForm, TextInput, PasswordInput, Button} from "carbon-components-svelte";
+    import {createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
+    import {goto} from '$app/navigation';
+    import {auth} from '../../firebase';
 
-    let email, password;
+    let username, email, password;
 
     let email_invalid = false;
+    let username_invalid = false;
     let password_invalid = false;
 
     $: email_invalid = email && !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i.test(email);
+    $: username_invalid = username && username.length < 3;
     $: password_invalid = password && password.length < 8;
 
-    function submit() {
-        alert(`${email}:${password}`)
+    async function submit() {
+        try {
+            const user = await createUserWithEmailAndPassword(auth, email, password)
+            await updateProfile(user.user, {displayName: username});
+            await setDoc(userDoc(auth.currentUser.id), {username, email});
+            await goto('/home');
+        } catch (error) {
+            alert(`Error creating user: ${error.message}`)
+            console.error(error);
+        }
     }
 </script>
 
@@ -24,6 +37,13 @@
             <Column>
                 <h1>Sign up</h1>
                 <FluidForm on:submit={submit}>
+                    <TextInput
+                        labelText="Username"
+                        placeholder="nix_on_the_gods" required
+                        bind:value={username}
+                        invalid={username_invalid}
+                        invalidText="Your username must be at least 3 characters long"
+                    />
                     <TextInput
                         labelText="Email"
                         placeholder="nix@the_gods.com" required

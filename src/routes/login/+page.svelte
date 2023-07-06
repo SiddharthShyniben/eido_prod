@@ -1,5 +1,8 @@
 <script>
     import {Content, Grid, Row, Column, FluidForm, TextInput, PasswordInput, Button} from "carbon-components-svelte";
+    import {signInWithEmailAndPassword} from "firebase/auth";
+    import {auth} from "../../firebase";
+    import {goto} from '$app/navigation';
 
     let email, password;
 
@@ -9,8 +12,14 @@
     $: email_invalid = email && !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i.test(email);
     $: password_invalid = password && password.length < 8;
 
-    function submit() {
-        alert(`${email}:${password}`)
+    async function submit() {
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            await goto('/admin');
+        } catch (error) {
+            alert(`Error logging in: ${error.message}`)
+            console.error(error);
+        }
     }
 </script>
 
