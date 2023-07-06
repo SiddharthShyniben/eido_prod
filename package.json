@@ -16,6 +16,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"carbon-icons-svelte": "^11.4.0",
 		"firebase": "^9.23.0"
 	}
 }
