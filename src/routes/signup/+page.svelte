@@ -14,6 +14,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>Sign up for Eido</title>
+</svelte:head>
+
 <Content>
     <Grid>
         <Row>

@@ -8,6 +8,10 @@
     } from "carbon-components-svelte";
 </script>
 
+<svelte:head>
+    <title>Eido</title>
+</svelte:head>
+
 <Content>
     <Grid>
         <Row>
