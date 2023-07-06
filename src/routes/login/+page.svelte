@@ -38,6 +38,9 @@
                     />
                     <Button disabled={!(email && password)} type="submit">Log in</Button>
                 </FluidForm>
+
+                <br><br>
+                <p><small><a href="/signup">Don't have an account? Sign up</a></small></p>
             </Column>
         </Row>
     </Grid>
