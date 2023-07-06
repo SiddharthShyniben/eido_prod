@@ -19,7 +19,11 @@
         HeaderNav,
         HeaderNavItem,
         SkipToContent,
-        Theme
+        Theme,
+        Content,
+        Grid,
+        Row,
+        Column
     } from "carbon-components-svelte";
     import {onAuthStateChanged} from "firebase/auth";
     import {onMount} from "svelte";
@@ -59,4 +63,12 @@
         {/if}
     </HeaderNav>
 </Header>
-<slot />
+<Content>
+    <Grid>
+        <Row>
+            <Column>
+                <slot />
+            </Column>
+        </Row>
+    </Grid>
+</Content>

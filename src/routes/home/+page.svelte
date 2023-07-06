@@ -1,12 +1,5 @@
 
 <script>
-    import {
-        Content,
-        Grid,
-        Row,
-        Column
-    } from "carbon-components-svelte";
-
     import {user} from "../../stores";
 
     let currentUser;
@@ -15,12 +8,4 @@
     })
 </script>
 
-<Content>
-    <Grid>
-        <Row>
-            <Column>
-                {JSON.stringify(currentUser)}
-            </Column>
-        </Row>
-    </Grid>
-</Content>
+{JSON.stringify(currentUser)}

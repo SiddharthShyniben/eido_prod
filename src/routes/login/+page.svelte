@@ -1,5 +1,5 @@
 <script>
-    import {Content, Grid, Row, Column, FluidForm, TextInput, PasswordInput, Button} from "carbon-components-svelte";
+    import {FluidForm, TextInput, PasswordInput, Button} from "carbon-components-svelte";
     import {signInWithEmailAndPassword} from "firebase/auth";
     import {auth} from "../../firebase";
     import {goto} from '$app/navigation';
@@ -27,34 +27,25 @@
     <title>Log in to Eido</title>
 </svelte:head>
 
-<Content>
-    <Grid>
-        <Row>
-            <Column>
-                <h1>Log in</h1>
-                <FluidForm on:submit={submit}>
-                    <TextInput
-                        labelText="Email"
-                        placeholder="nix@the_gods.com" required
-                        bind:value={email}
-                        invalid={email_invalid}
-                        invalidText="You must provide a valid email"
-                    />
-                    <PasswordInput
-                        required
-                        type="password"
-                        labelText="Password"
-                        placeholder="••••••••••"
-                        bind:value={password}
-                        invalid={password_invalid}
-                        invalidText="Your password must be at least 8 characters long"
-                    />
-                    <Button disabled={!(email && password)} type="submit">Log in</Button>
-                </FluidForm>
+<FluidForm on:submit={submit}>
+    <TextInput
+        labelText="Email"
+        placeholder="nix@the_gods.com" required
+        bind:value={email}
+        invalid={email_invalid}
+        invalidText="You must provide a valid email"
+    />
+    <PasswordInput
+        required
+        type="password"
+        labelText="Password"
+        placeholder="••••••••••"
+        bind:value={password}
+        invalid={password_invalid}
+        invalidText="Your password must be at least 8 characters long"
+    />
+    <Button disabled={!(email && password)} type="submit">Log in</Button>
+</FluidForm>
 
-                <br><br>
-                <p><small><a href="/signup">Don't have an account? Sign up</a></small></p>
-            </Column>
-        </Row>
-    </Grid>
-</Content>
+<br><br>
+<p><small><a href="/signup">Don't have an account? Sign up</a></small></p>
