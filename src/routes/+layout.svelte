@@ -16,12 +16,34 @@
 <script>
     import {
         Header,
-        // HeaderNav,
-        // HeaderNavItem,
-        // HeaderNavMenu,
+        HeaderNav,
+        HeaderNavItem,
         SkipToContent,
         Theme
     } from "carbon-components-svelte";
+    import {onAuthStateChanged} from "firebase/auth";
+    import {onMount} from "svelte";
+    import {auth} from "../firebase";
+    import {user} from "../stores";
+
+    let currentUser;
+
+    user.subscribe(user => {
+        currentUser = user;
+    })
+
+    onMount(() => {
+        onAuthStateChanged(
+            auth,
+            u => {
+                user.update(() => u)
+            },
+            error => {
+                user.update(() => null);
+                console.log(error);
+            }
+        )
+    })
 </script>
 
 <Theme theme="g100" />
@@ -30,17 +52,11 @@
     <svelte:fragment slot="skip-to-content">
         <SkipToContent />
     </svelte:fragment>
-    <!--
-        <HeaderNav>
-        <HeaderNavItem href="/" text="Link 1" />
-        <HeaderNavItem href="/" text="Link 2" />
-        <HeaderNavItem href="/" text="Link 3" />
-        <HeaderNavMenu text="Menu">
-        <HeaderNavItem href="/" text="Link 1" />
-        <HeaderNavItem href="/" text="Link 2" />
-        <HeaderNavItem href="/" text="Link 3" />
-        </HeaderNavMenu>
-        </HeaderNav>
-    -->
+    <HeaderNav>
+        {#if currentUser}
+            <HeaderNavItem text="Hello, {currentUser.displayName}"/>
+            <HeaderNavItem href="/logout" text="Log out"/> <!-- TODO -->
+        {/if}
+    </HeaderNav>
 </Header>
 <slot />

@@ -2,7 +2,8 @@
     import {Content, Grid, Row, Column, FluidForm, TextInput, PasswordInput, Button} from "carbon-components-svelte";
     import {createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
     import {goto} from '$app/navigation';
-    import {auth} from '../../firebase';
+    import {auth, userDoc} from '../../firebase';
+    import { setDoc } from "firebase/firestore";
 
     let username, email, password;
 
@@ -18,7 +19,6 @@
         try {
             const user = await createUserWithEmailAndPassword(auth, email, password)
             await updateProfile(user.user, {displayName: username});
-            await setDoc(userDoc(auth.currentUser.id), {username, email});
             await goto('/home');
         } catch (error) {
             alert(`Error creating user: ${error.message}`)

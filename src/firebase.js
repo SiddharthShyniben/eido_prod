@@ -19,6 +19,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 // const analytics = getAnalytics(app);
 
-const getUser = userId => doc(db, "user", userId);
+const userDoc = userId => doc(db, "user", userId);
 
-export {auth, getUser}
+export {auth, userDoc}
