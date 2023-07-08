@@ -15,7 +15,7 @@
     async function submit() {
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            await goto('/admin');
+            await goto('/home');
         } catch (error) {
             alert(`Error logging in: ${error.message}`)
             console.error(error);
