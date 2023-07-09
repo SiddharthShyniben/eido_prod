@@ -36,7 +36,7 @@
 
     {#if tuts.length > 0}
         {#each tuts as tut}
-            <ClickableTile href="/tutorial/{tut.fullPath.slice(4, -3)}">
+            <ClickableTile href="/tutorials/{tut.fullPath.slice(4, -3)}">
                 <strong>{formatTitle(tut)}</strong>
             </ClickableTile>
         {/each}
