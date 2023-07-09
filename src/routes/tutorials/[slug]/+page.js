@@ -10,7 +10,7 @@ export async function load({ params }) {
         })
     })
 
-    if (!currUser) throw redirect(306, '/home');
+    if (!currUser) throw redirect(302, '/home');
     
     const tutRef = ref(storage, `out/${params.slug}.js`);
     const URL = await getDownloadURL(tutRef);
