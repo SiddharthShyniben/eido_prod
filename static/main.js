@@ -1,17 +1,16 @@
-const $ = (...args) => document.querySelector(...args);
+const _$ = (...args) => document.querySelector(...args);
 const $$ = (...args) => document.querySelectorAll(...args);
 const sleep = (ms = 1000) => new Promise(resolve => setTimeout(resolve, ms));
 
 main.innerHTML += docsCode;
-const code = $('code');
-console.log(code);
+const code = _$('code');
 
 for (let line of init) {
 	code.appendChild(line);
 }
 
 let lines = [...$$('.line:not(.line .line)')];
-const docs = $("#docs");
+const docs = _$("#docs");
 const docEntries = $$("#docs p");
 
 class AsyncQueue {
@@ -21,7 +20,6 @@ class AsyncQueue {
 	}
 
 	enqueue(fn, execute = true) {
-		console.log('QUEUED')
 		this.functions.push(fn);
 		if (!this.executing && execute) this.execute();
 	}
@@ -32,7 +30,6 @@ class AsyncQueue {
 
 		while (this.functions.length) {
 			const fn = this.functions.shift();
-			console.log('CALL');
 			await fn();
 		}
 
@@ -40,7 +37,6 @@ class AsyncQueue {
 	}
 
 	makeFunction(fn) {
-		console.log(fn);
 		return (...args) => this.enqueue(() => fn(...args));
 	}
 }
@@ -48,8 +44,8 @@ class AsyncQueue {
 const queue = new AsyncQueue();
 
 let i = 0;
-const next = $('#next');
-const previous = $('#previous');
+const next = _$('#next');
+const previous = _$('#previous');
 
 const nextFn = async () => {
 	if (i < steps.length) {
@@ -172,7 +168,6 @@ async function _pushLines(after, lines) {
 	}
 
 	await Promise.all(ps);
-	console.log(lines[Math.ceil(lines.length / 2)])
 	lines[Math.ceil(lines.length - 1)].scrollIntoView({
 		behavior: 'smooth', block: 'center', inline: 'center'
 	});
