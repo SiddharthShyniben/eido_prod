@@ -13,6 +13,7 @@
 <svelte:head>
     <script id="the-script"></script>
     <script id="the-script-two"></script>
+    <link rel="stylesheet" href="/style.css" />
 </svelte:head>
 <div id="main">
     <div class="code-container"><code></code></div>
