@@ -1,9 +1,13 @@
 <script>
-    import {FluidForm, TextInput, PasswordInput, Button} from "carbon-components-svelte";
+    import {FluidForm, TextInput, PasswordInput, Button, Loading} from "carbon-components-svelte";
     import {signInWithEmailAndPassword} from "firebase/auth";
     import {auth} from "../../firebase";
-    import {goto} from '$app/navigation';
+    import {user} from "../../stores";
 
+    import {goto} from '$app/navigation';
+    import {browser} from '$app/environment';
+
+    let loading = true;
     let email, password;
 
     let email_invalid = false;
@@ -11,6 +15,11 @@
 
     $: email_invalid = email && !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i.test(email);
     $: password_invalid = password && password.length < 8;
+
+    user.subscribe(u => {
+        if (u && browser) goto('/home');
+        loading = false;
+    });
 
     async function submit() {
         try {
@@ -26,6 +35,10 @@
 <svelte:head>
     <title>Log in to Eido</title>
 </svelte:head>
+
+{#if loading}
+    <Loading />
+{/if}
 
 <FluidForm on:submit={submit}>
     <TextInput
