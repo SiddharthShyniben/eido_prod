@@ -1,6 +1,6 @@
-import {error, redirect} from '@sveltejs/kit';
+import {redirect} from '@sveltejs/kit';
 import {storage} from '../../../firebase';
-import {getBytes, getDownloadURL, ref} from 'firebase/storage';
+import {getDownloadURL, ref} from 'firebase/storage';
 import {user} from "../../../stores";
 
 export async function load({ params }) {
@@ -11,7 +11,7 @@ export async function load({ params }) {
     })
 
     if (!currUser) throw redirect(302, '/home');
-    
+
     const tutRef = ref(storage, `out/${params.slug}.js`);
     const URL = await getDownloadURL(tutRef);
     return {URL};
