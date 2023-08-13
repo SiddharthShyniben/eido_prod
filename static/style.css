@@ -315,4 +315,55 @@ main {
 
 .bx--grid {
 	padding: 0 !important;
+	overflow: hidden;
+}
+
+code.fly-up {
+	animation: move-out 1s forwards;
+}
+
+code.hidden {
+	transform: translateX(100%);
+}
+
+code.pull-up {
+	animation: unhide 1s forwards;
+}
+
+@keyframes move-out {
+	to {
+		transform: translateX(-100%);
+	}
+}
+
+@keyframes unhide {
+	to {
+		transform: translateX(0%);
+	}
+}
+
+.code-container img {
+	transform: scale(0.7) translateX(150%);
+	animation: pull-up 1s ease forwards;
+}
+
+.code-container:has(img) {
+	overflow-x: hidden;
+}
+
+@keyframes pull-up {
+	to {
+		transform: scale(0.7) translateX(0%);
+	}
+}
+
+.code-container img.pull-out {
+	transform: scale(0.7) translateX(0%);
+	animation: pull-out 1s ease forwards;
+}
+
+@keyframes pull-out {
+	to {
+		transform: scale(0.7) translateX(-150%);
+	}
 }

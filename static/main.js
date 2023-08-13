@@ -65,7 +65,43 @@ const removeLine = queue.makeFunction(_removeLine);
 const saveLine = queue.makeFunction(_saveLine);
 const pushLine = queue.makeFunction(_pushLine);
 const pushLines = queue.makeFunction(_pushLines);
+const pushImage = queue.makeFunction(_pushImage);
+const removeImage = queue.makeFunction(_removeImage);
 const defocus = queue.makeFunction(_defocus);
+
+const imageCache = {};
+
+function _pushImage(src) {
+	return new Promise(resolve => {
+		const image = document.createElement('img');
+		image.src = src;
+		imageCache[src] = image;
+
+		code.classList.add('fly-up');
+		setTimeout(() => {
+			code.parentNode.insertBefore(image, code);
+			code.classList.add('hidden');
+			code.classList.remove('fly-up');
+
+			resolve();
+		}, 1000)
+	})
+}
+
+function _removeImage(src) {
+	return new Promise(resolve => {
+		imageCache[src].classList.add('pull-out')
+		setTimeout(() => {
+			imageCache[src].remove();
+			code.classList.add('pull-up');
+			setTimeout(() => {
+				code.classList.remove('hidden');
+				code.classList.remove('pull-up');
+				resolve();
+				}, 1000)
+		}, 1000)
+	})
+}
 
 function _focusLine(...lineNrs) {
 	lines.forEach((line, i) => {
