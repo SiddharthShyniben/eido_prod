@@ -287,7 +287,6 @@ data-err {
 	width: 40vw;
 
 	scroll-snap-type: y proximity;
-	z-index: 9999;
 	
 	padding: 1em;
 	font-size: 16px;
