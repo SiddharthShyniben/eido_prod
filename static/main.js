@@ -13,6 +13,9 @@ let lines = [...$$('.line:not(.line .line)')];
 const docs = _$("#docs");
 const docEntries = $$("#docs p");
 
+// classify(el, `+class -otherclass otherclass2`)
+const classify = (a,b)=>b.split` `.map(c=>c[0]=='-'?['remove',c.slice(1)]:['add',c[0]=='+'?c.slice(1):c]).map(([d,e])=>a.classList[d](e))
+
 class AsyncQueue {
 	constructor() {
 		this.functions = [];
@@ -59,125 +62,42 @@ const prevFn = async () => {
 	}
 }
 
-const focusLine = queue.makeFunction(_focusLine)
-const focusToken = queue.makeFunction(_focusToken)
-const removeLine = queue.makeFunction(_removeLine);
-const saveLine = queue.makeFunction(_saveLine);
-const pushLine = queue.makeFunction(_pushLine);
-const pushLines = queue.makeFunction(_pushLines);
-const pushImage = queue.makeFunction(_pushImage);
-const removeImage = queue.makeFunction(_removeImage);
-const defocus = queue.makeFunction(_defocus);
+const focusLine = queue.makeFunction((...lineNrs) => lines.forEach((line, i) => classify(line, lineNrs.includes(i + 1) ? 'focus -dim' : '-focus dim')))
+const focusToken = queue.makeFunction((...locs) => locs.forEach(([lineNr, ...tokenNrs]) => lines[lineNr - 1].childNodes.forEach((node, i) => classify(node, tokenNrs.includes(i + 1) ? 'focus -dim' : '-focus dim'))));
+const removeLine = queue.makeFunction(async (...lineNrs) => {
+	const animations = [];
 
-const imageCache = {};
+	await Promise.all(lineNrs.map(async l => {
+		const line = lines[l - 1];
+		classify(line, 'remove')
+		animations.push(
+			Promise.all(lines.slice(l).map(async (line) => {
+				classify(line, 'remove-next');
+				await sleep(500);
+			}))
+		);
+	}))
 
-function _pushImage(src) {
-	return new Promise(resolve => {
-		const image = document.createElement('img');
-		image.src = src;
-		imageCache[src] = image;
-
-		code.classList.add('fly-up');
-		setTimeout(() => {
-			code.parentNode.insertBefore(image, code);
-			code.classList.add('hidden');
-			code.classList.remove('fly-up');
-
-			resolve();
-		}, 1000)
-	})
-}
-
-function _removeImage(src) {
-	return new Promise(resolve => {
-		imageCache[src].classList.add('pull-out')
-		setTimeout(() => {
-			imageCache[src].remove();
-			code.classList.add('pull-up');
-			setTimeout(() => {
-				code.classList.remove('hidden');
-				code.classList.remove('pull-up');
+	await Promise.all(lineNrs.map((l) => {
+		const line = lines[l - 1];
+		return new Promise((resolve) => {
+			sleep(500).then(() => {
+				classify(line, '-remove')
+				line.remove();
+				lines = [...$$('.line:not(.line .line)')];
 				resolve();
-				}, 1000)
-		}, 1000)
-	})
-}
-
-function _focusLine(...lineNrs) {
-	lines.forEach((line, i) => {
-		if (lineNrs.includes(i + 1)) {
-			line.classList.add('focus');
-			line.classList.remove('dim');
-		} else {
-			line.classList.add('dim')
-			line.classList.remove('focus');
-		}
-	})
-}
-
-function _focusToken(...locs) {
-	locs.forEach(loc => {
-		const [lineNr, ...tokenNrs] = loc;
-		lines[lineNr - 1].childNodes.forEach((node, i) => {
-			if (tokenNrs.includes(i + 1)) {
-				node.classList.add('focus');
-				node.classList.remove('dim');
-			} else {
-				node.classList.add('dim')
-				node.classList.remove('focus');
-			}
+			});
 		});
-	});
-}
-
-function _removeLine(...lineNrs) {
-	return new Promise(resolve => {
-		const animations = [];
-
-		for (const l of lineNrs) {
-			const line = lines[l - 1];
-			line.classList.add('remove');
-			animations.push(
-				new Promise((resolve) => {
-					lines.slice(l).forEach(async (line) => {
-						line.classList.add('remove-next');
-						await sleep(500);
-						line.classList.remove('remove-next');
-					});
-					resolve();
-				})
-			);
-		}
-
-		Promise.all(animations)
-			.then(() => {
-				const removalPromises = lineNrs.map((l) => {
-					const line = lines[l - 1];
-					return new Promise((resolve) => {
-						sleep(500).then(() => {
-							line.classList.remove('remove');
-							line.remove();
-							lines = [...$$('.line:not(.line .line)')];
-							resolve();
-						});
-					});
-				});
-				Promise.all(removalPromises).then(() => {
-					resolve();
-				});
-		});
-	});
-}
-
-function _saveLine(l) {
+	}))
+});
+const saveLine = queue.makeFunction(l => {
 	const line = lines[l - 1];
 	line.remove();
 	lines = [...$$('.line:not(.line .line)')];
 	return line;
-}
-
-function _pushLine(after, line) {
-	line.classList.add('insert');
+});
+const pushLine = queue.makeFunction(async (after, line) => {
+	classify(line, 'insert')
 
 	const l = lines[after - 1];
 	if (l) {
@@ -194,20 +114,44 @@ function _pushLine(after, line) {
 	})
 
 	lines = [...$$('.line:not(.line .line)')];
-	return new Promise(resolve => setTimeout(() => resolve(line.classList.remove('insert')), 500))
-}
-
-async function _pushLines(after, lines) {
+	await sleep(500);
+	classify(line, '-insert')
+});
+const pushLines = queue.makeFunction(async (after, lines) => {
 	const ps = [];
 	for (let i = 0; i < lines.length; i++) {
 		ps.push(_pushLine(after + i, lines[i]));
 	}
 
 	await Promise.all(ps);
-	lines[Math.ceil(lines.length - 1)].scrollIntoView({
-		behavior: 'smooth', block: 'center', inline: 'center'
-	});
-}
+	lines[Math.ceil(lines.length - 1)].scrollIntoView({behavior: 'smooth', block: 'center', inline: 'center'});
+});
+
+const imageCache = {};
+const pushImage = queue.makeFunction(async src => {
+	const image = document.createElement('img');
+	image.src = src;
+	imageCache[src] = image;
+
+	classify(code, 'fly-up')
+	await sleep(1000);
+
+	code.parentNode.insertBefore(image, code);
+	classify(code, 'hidden -fly-up')
+});
+const removeImage = queue.makeFunction(async src => {
+	classify(imageCache[src], 'pull-out')
+	await sleep(1000);
+
+	imageCache[src].remove();
+	classify(code, 'pull-up')
+	await sleep(1000);
+
+	classify(code, '-hidden -pull-up')
+	resolve();
+});
+
+const defocus = queue.makeFunction(() => $$('.dim, .focus').forEach(el => classify(el, '-dim -focus')));
 
 function saveLines(...lineNrs) {
 	const ls = [];
@@ -220,18 +164,7 @@ function saveLines(...lineNrs) {
 	return ls;
 }
 
-function _defocus() {
-	$$('.dim, .focus').forEach(el => {
-		el.classList.remove('dim', 'focus')
-	})
-}
-
-const observerOptions = {
-	root: docs,
-	threshold: 0.1,
-};
-
-const observer = new IntersectionObserver(callback, observerOptions);
+const observer = new IntersectionObserver(callback, {root: docs, threshold: 0.1});
 
 let lastIntersecting = 1;
 function callback(entries) {
@@ -240,7 +173,6 @@ function callback(entries) {
 		const id = +target.id.slice(1);
 
 		if (!isIntersecting) return;
-
 		if (id > lastIntersecting) nextFn();
 		else if (id < lastIntersecting) prevFn();
 
