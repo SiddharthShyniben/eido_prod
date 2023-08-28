@@ -96,7 +96,8 @@ const saveLine = queue.makeFunction(l => {
 	lines = [...$$('.line:not(.line .line)')];
 	return line;
 });
-const pushLine = queue.makeFunction(async (after, line) => {
+let _pushLine;
+const pushLine = queue.makeFunction(_pushLine = async (after, line) => {
 	classify(line, 'insert')
 
 	const l = lines[after - 1];
