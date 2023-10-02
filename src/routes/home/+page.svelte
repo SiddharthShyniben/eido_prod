@@ -22,10 +22,11 @@
 
     async function main() {
         const tutorials = await listAll(listRef);
-        tuts = tutorials.items;
+        tuts = tutorials.items.map(t => ({
+            title: t.name.split('---')[1].split('-')[0],
+            fullPath: t.fullPath
+        }))
     }
-
-    const formatTitle = t => [...t.fullPath.slice(4, -3)].map((c, i) => i === 0 ? c.toUpperCase() : c).join('')
 </script>
 
 {#if loading}
@@ -37,7 +38,7 @@
     {#if tuts.length > 0}
         {#each tuts as tut}
             <ClickableTile href="/tutorials/{tut.fullPath.slice(4, -3)}">
-                <strong>{formatTitle(tut)}</strong>
+                <strong>{tut.title}</strong>
             </ClickableTile>
         {/each}
     {:else}
