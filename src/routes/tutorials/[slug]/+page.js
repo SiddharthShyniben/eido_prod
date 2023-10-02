@@ -5,9 +5,7 @@ import {user} from "../../../stores";
 
 export async function load({ params }) {
     const currUser = await new Promise(resolve => {
-        user.subscribe(u => {
-            resolve(u);
-        })
+        user.subscribe(u => resolve(u))
     })
 
     if (!currUser) throw redirect(302, '/home');

@@ -24,7 +24,8 @@
         const tutorials = await listAll(listRef);
         tuts = tutorials.items.map(t => ({
             title: t.name.split('---')[1].split('-')[0],
-            fullPath: t.fullPath
+            fullPath: t.fullPath,
+            routerLink: t.name.slice(0, -3)
         }))
     }
 </script>
@@ -37,7 +38,7 @@
 
     {#if tuts.length > 0}
         {#each tuts as tut}
-            <ClickableTile href="/tutorials/{tut.fullPath.slice(4, -3)}">
+            <ClickableTile href="/tutorials/{tut.routerLink}">
                 <strong>{tut.title}</strong>
             </ClickableTile>
         {/each}
