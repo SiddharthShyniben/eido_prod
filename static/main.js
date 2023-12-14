@@ -9,7 +9,7 @@ for (let line of init) {
 	code.appendChild(line);
 }
 
-let lines = [...$$('.line:not(.line .line)')];
+const lines = () => [...$$('.line:not(.line .line)')];
 const docs = _$("#docs");
 const docEntries = $$("#docs p");
 
@@ -62,45 +62,46 @@ const prevFn = async () => {
 	}
 }
 
-const focusLine = queue.makeFunction((...lineNrs) => lines.forEach((line, i) => classify(line, lineNrs.includes(i + 1) ? 'focus -dim' : '-focus dim')))
-const focusToken = queue.makeFunction((...locs) => locs.forEach(([lineNr, ...tokenNrs]) => lines[lineNr - 1].childNodes.forEach((node, i) => classify(node, tokenNrs.includes(i + 1) ? 'focus -dim' : '-focus dim'))));
+const focusLine = queue.makeFunction((...lineNrs) => lines().forEach((line, i) => classify(line, lineNrs.includes(i + 1) ? 'focus -dim' : '-focus dim')))
+const focusToken = queue.makeFunction((...locs) => locs.forEach(([lineNr, ...tokenNrs]) => lines()[lineNr - 1].childNodes.forEach((node, i) => classify(node, tokenNrs.includes(i + 1) ? 'focus -dim' : '-focus dim'))));
 const removeLine = queue.makeFunction(async (...lineNrs) => {
+	if (Array.isArray(lineNrs[0])) lineNrs = lineNrs[0]
+	console.log({lineNrs}, 'removing')
 	const animations = [];
+	const _lines = lines();
 
-	await Promise.all(lineNrs.map(async l => {
-		const line = lines[l - 1];
+	await Promise.all(lineNrs.map(async line => { // ????
+		// const line = _lines[l - 1];
 		classify(line, 'remove')
 		animations.push(
-			Promise.all(lines.slice(l).map(async (line) => {
+			Promise.all(lineNrs.map(async (line) => {
 				classify(line, 'remove-next');
 				await sleep(500);
 			}))
 		);
 	}))
 
-	await Promise.all(lineNrs.map((l) => {
-		const line = lines[l - 1];
+	await Promise.all(lineNrs.map((line) => {
+		// const line = lines()[l - 1];
 		return new Promise((resolve) => {
 			sleep(500).then(() => {
 				classify(line, '-remove')
 				line.remove();
-				lines = [...$$('.line:not(.line .line)')];
 				resolve();
 			});
 		});
 	}))
 });
 const saveLine = queue.makeFunction(l => {
-	const line = lines[l - 1];
+	const line = lines()[l - 1];
 	line.remove();
-	lines = [...$$('.line:not(.line .line)')];
 	return line;
 });
 let _pushLine;
 const pushLine = queue.makeFunction(_pushLine = async (after, line) => {
 	classify(line, 'insert')
 
-	const l = lines[after - 1];
+	const l = lines()[after - 1];
 	if (l) {
 		l.parentNode.insertBefore(line, l.nextSibling); // ugh
 	} else {
@@ -114,14 +115,14 @@ const pushLine = queue.makeFunction(_pushLine = async (after, line) => {
 		el.removeAttribute('lsp');
 	})
 
-	lines = [...$$('.line:not(.line .line)')];
 	await sleep(500);
 	classify(line, '-insert')
 });
 const pushLines = queue.makeFunction(async (after, lines) => {
 	const ps = [];
 	for (let i = 0; i < lines.length; i++) {
-		ps.push(_pushLine((after + i) || 1, lines[i]));
+		console.log(lines[i], after + i)
+		ps.push(_pushLine(after + i, lines[i]));
 		await sleep(50)
 	}
 
@@ -157,11 +158,10 @@ const defocus = queue.makeFunction(() => $$('.dim, .focus').forEach(el => classi
 function saveLines(...lineNrs) {
 	const ls = [];
 	for (const l of lineNrs) {
-		const line = lines[l - 1];
+		const line = lines()[l - 1];
 		line.remove();
 		ls.push(line);
 	}
-	lines = [...$$('.line:not(.line .line)')];
 	return ls;
 }
 

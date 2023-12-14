@@ -284,7 +284,9 @@ data-err {
 	height: 100vh;
 	overflow-y: scroll;
 	background: #181818;
+	min-width: 40vw;
 	width: 40vw;
+	max-width: 40vw;
 
 	scroll-snap-type: y proximity;
 	
