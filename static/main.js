@@ -167,8 +167,10 @@ function saveLines(...lineNrs) {
 
 const observer = new IntersectionObserver(callback, {root: docs, threshold: 0.1});
 
+let first_load = true;
 let lastIntersecting = 1;
 function callback(entries) {
+	if (first_load) return first_load = false;
 	entries.forEach(entry => {
 		const { target, isIntersecting } = entry;
 		const id = +target.id.slice(1);
