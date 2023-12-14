@@ -121,7 +121,8 @@ const pushLine = queue.makeFunction(_pushLine = async (after, line) => {
 const pushLines = queue.makeFunction(async (after, lines) => {
 	const ps = [];
 	for (let i = 0; i < lines.length; i++) {
-		ps.push(_pushLine(after + i, lines[i]));
+		ps.push(_pushLine((after + i) || 1, lines[i]));
+		await sleep(50)
 	}
 
 	await Promise.all(ps);
@@ -149,7 +150,6 @@ const removeImage = queue.makeFunction(async src => {
 	await sleep(1000);
 
 	classify(code, '-hidden -pull-up')
-	resolve();
 });
 
 const defocus = queue.makeFunction(() => $$('.dim, .focus').forEach(el => classify(el, '-dim -focus')));
