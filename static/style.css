@@ -101,7 +101,8 @@ pre.shiki {
 	display: flex;
 }
 
-.shiki>.code-container>code {
+.shiki>.code-container>code ,
+.shiki>.code-container>img {
 	flex-grow: 1;
 }
 
@@ -345,6 +346,7 @@ code.pull-up {
 }
 
 .code-container img {
+  object-fit: scale-down;
 	transform: scale(0.7) translateX(150%);
 	animation: pull-up 1s ease forwards;
 }
